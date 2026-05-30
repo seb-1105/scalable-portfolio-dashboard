@@ -1,35 +1,35 @@
 # Portfolio Dashboard
 
-Lokales, datenschutzfreundliches Portfolio-Tracking auf Basis der Scalable Capital Transaktionshistorie.  
-Keine Cloud, keine externen Server – alle Daten bleiben im Browser.
+Local, privacy-friendly portfolio tracking based on your Scalable Capital transaction history.  
+No cloud, no external servers — all data stays in your browser.
 
 ---
 
-## Funktionen
+## Features
 
-- **CSV-Import** aus Scalable Capital (Konto → Transaktionen → Export)
-- **Automatische ISIN-Auflösung** via OpenFIGI → Yahoo Finance Ticker
-- **Live-Kurse** über lokalen yfinance-Server (alle Weltbörsen, kein CORS)
-- **FX-Umrechnung** in EUR (open.er-api.com)
-- **WACC-Berechnung** (Weighted Average Cost of Capital) für den Ø Kaufpreis
-- **Verkaufte Positionen** werden erkannt, ausgegraut und mit realisiertem G/V ausgewiesen
-- **Hover-Tooltip** auf jede Position zeigt komplette Kauf-/Verkaufshistorie
-- **Donut-Chart** zur Portfolioverteilung
-- **Monatlicher G/V-Chart** (realisierte Gewinne/Verluste)
-- **5 Summary-Kacheln**: Kapital · Aktueller Wert · Gesamtgewinn · Unrealisierter G/V · Positionen
-- Alle Daten werden im `localStorage` des Browsers gespeichert (kein Account nötig)
-
----
-
-## Voraussetzungen
-
-- Python 3.8 oder neuer (bereits installiert prüfen: `python3 --version`)
-- Finnhub.io API-Key zur Abrufung von Live Kursdaten (Registrierung erforderlich)
-- Keine weiteren manuellen Installationen nötig – `start.py` erledigt alles
+- **CSV import** from Scalable Capital (Account → Transactions → Export)
+- **Automatic ISIN resolution** via OpenFIGI → Yahoo Finance ticker
+- **Live prices** via local yfinance server (all global exchanges, no CORS issues)
+- **FX conversion** to EUR (open.er-api.com)
+- **WACC calculation** (Weighted Average Cost of Capital) for the average purchase price
+- **Sold positions** are automatically detected, greyed out, and shown with realised P&L
+- **Hover tooltip** on each position shows the complete buy/sell history
+- **Donut chart** for portfolio allocation
+- **Monthly P&L chart** (realised gains/losses)
+- **5 summary cards**: Capital · Current Value · Total P&L · Unrealised P&L · Positions
+- All data is stored in the browser's `localStorage` — no account required
 
 ---
 
-## Starten (empfohlen)
+## Requirements
+
+- Python 3.8 or newer (check with: `python3 --version`)
+- A Scalable Capital transaction history `.csv` file
+- No further manual installation needed — `start.py` handles everything
+
+---
+
+## Quick Start (recommended)
 
 ```bash
 # macOS / Linux
@@ -39,91 +39,96 @@ python3 start.py
 python start.py
 ```
 
-Das Skript:
-1. Erstellt automatisch eine virtuelle Umgebung (`.venv`)
-2. Installiert alle Abhängigkeiten (`yfinance`)
-3. Startet den Kursserver auf `http://localhost:8765`
-4. Öffnet `portfolio-dashboard.html` automatisch im Browser
+The script will:
+1. Automatically create a virtual environment (`.venv`)
+2. Install all dependencies (`yfinance`)
+3. Start the price server at `http://localhost:8765`
+4. Open `portfolio-dashboard.html` automatically in your browser
 
-Dann einfach die Scalable Capital CSV per Drag & Drop ins Dashboard ziehen.  
-Server stoppen: **Strg+C** im Terminal.
+Then simply drag and drop your Scalable Capital CSV onto the dashboard.  
+You can export it in Scalable under Home → Transactions → three dots (top right) → Select All → Export transactions as CSV.  
+Note: this must be done manually each time — automated export is not yet supported by Scalable.
+
+Stop the server: **Ctrl+C** in the terminal.
 
 ---
 
-## Manueller Start (alternativ)
+## Manual Start (alternative)
 
-### 1. Kursserver starten
+### 1. Start the price server
 
 ```bash
-cd /pfad/zum/Portfolio-Dashboard
+cd /path/to/Portfolio-Dashboard
 python3 price_server.py
 ```
 
-### 2. Dashboard öffnen
+### 2. Open the dashboard
 
-`portfolio-dashboard.html` im Browser öffnen (Doppelklick oder `open portfolio-dashboard.html`).
+Open `portfolio-dashboard.html` in your browser (double-click or `open portfolio-dashboard.html`).
 
-### 3. CSV importieren
+### 3. Import CSV
 
-Scalable Capital → Konto → Transaktionen → Export als CSV  
-→ Datei per Drag & Drop auf das Dashboard ziehen oder über „CSV importieren" auswählen.
+Scalable Capital → Account → Transactions → Export as CSV  
+→ Drag and drop the file onto the dashboard or click "CSV importieren".
 
 ---
 
-## Projektstruktur
+## Project Structure
 
 ```
 Portfolio-Dashboard/
-├── portfolio-dashboard.html   # Komplettes Frontend (eine Datei, keine Dependencies)
-├── price_server.py            # Lokaler HTTP-Server für yfinance-Kurse (Port 8765)
+├── portfolio-dashboard.html   # Complete frontend (single file, no external dependencies)
+├── price_server.py            # Local HTTP server for yfinance prices (port 8765)
+├── start.py                   # Cross-platform setup & start script
+├── requirements.txt           # Python dependencies
 └── README.md
 ```
 
 ---
 
-## Technische Details
+## Technical Details
 
-### CSV-Format (Scalable Capital)
+### CSV Format (Scalable Capital)
 
-| Spalte      | Beschreibung                         |
-|-------------|--------------------------------------|
-| date        | Transaktionsdatum (DD.MM.YY)         |
-| time        | Uhrzeit                              |
-| status      | `Executed` / `Cancelled`            |
-| description | Wertpapier-Name                      |
-| assetType   | Security / ...                       |
-| type        | `Buy` / `Sell` / `Savings Plan`     |
-| isin        | ISIN des Wertpapiers                 |
-| shares      | Stückzahl                            |
-| price       | Stückpreis                           |
-| amount      | Gesamtbetrag (negativ bei Käufen)    |
-| fee / tax   | Gebühren / Steuern                   |
-| currency    | Handelswährung                       |
+| Column      | Description                              |
+|-------------|------------------------------------------|
+| date        | Transaction date (DD.MM.YY)              |
+| time        | Time of transaction                      |
+| status      | `Executed` / `Cancelled`                |
+| description | Security name                            |
+| assetType   | Security / ...                           |
+| type        | `Buy` / `Sell` / `Savings Plan`         |
+| isin        | ISIN of the security                     |
+| shares      | Number of shares                         |
+| price       | Price per share                          |
+| amount      | Total amount (negative for purchases)    |
+| fee / tax   | Fees / taxes                             |
+| currency    | Trading currency                         |
 
-Nur Zeilen mit `status = Executed` und `type = Buy/Sell/Savings Plan` werden verarbeitet.  
-Die CSV wird **chronologisch sortiert** verarbeitet (älteste zuerst), damit WACC und Bestandsrechnung korrekt sind.
+Only rows with `status = Executed` and `type = Buy / Sell / Savings Plan` are processed.  
+The CSV is sorted **chronologically** (oldest first) before processing, so WACC and position calculations are correct.
 
-### ISIN-Auflösung
+### ISIN Resolution
 
-1. Cache prüfen (`localStorage`, Version 2)
-2. Batch-Auflösung via [OpenFIGI API](https://www.openfigi.com/) (kostenlos, kein Key)
-3. Finnhub als Einzelfallback (optionaler API Key)
-4. Direkte ISIN an yfinance-Server (funktioniert für viele Wertpapiere)
+1. Check cache (`localStorage`, version 2)
+2. Batch resolution via [OpenFIGI API](https://www.openfigi.com/) (free, no key required)
+3. Finnhub as single-item fallback (optional API key)
+4. Send ISIN directly to yfinance server (works for many securities)
 
-### Ticker-Fallbacks (CoinShares ETPs)
+### Ticker Fallbacks (CoinShares ETPs)
 
-Einige CoinShares-ETPs sind auf Yahoo Finance Deutschland nicht gelistet.  
-`price_server.py` enthält eine `TICKER_FALLBACK`-Dict mit Alternativ-Tickern:
+Some CoinShares ETPs are not listed on Yahoo Finance Germany.  
+`price_server.py` contains a `TICKER_FALLBACK` dict with alternative tickers:
 
-| Ticker (Xetra) | Fallback          | Grund                            |
-|----------------|-------------------|----------------------------------|
-| CETH.DE        | GB00BLD4ZM24      | ISIN direkt (kein Xetra-Listing) |
-| XRRL.DE        | XRPL.PA           | Euronext Paris                   |
-| CSDA.DE        | CSDA.PA           | Euronext Paris                   |
+| Ticker (Xetra) | Fallback     | Reason                              |
+|----------------|--------------|-------------------------------------|
+| CETH.DE        | GB00BLD4ZM24 | Direct ISIN (no Xetra listing)      |
+| XRRL.DE        | XRPL.PA      | Euronext Paris                      |
+| CSDA.DE        | CSDA.PA      | Euronext Paris                      |
 
-Weitere Fallbacks können in `TICKER_FALLBACK` in `price_server.py` eingetragen werden.
+Additional fallbacks can be added to `TICKER_FALLBACK` in `price_server.py`.
 
-### Kursserver-API
+### Price Server API
 
 ```
 GET /health
@@ -135,8 +140,8 @@ GET /prices?tickers=AAPL,ASML.AS,IE00BFZXGZ54
 
 ---
 
-## Datenschutz
+## Privacy
 
-- Keine Daten verlassen deinen Browser (außer Kursabfragen an Yahoo Finance / OpenFIGI)
-- CSV-Daten werden ausschließlich in `localStorage` gespeichert
-- Der Kursserver läuft lokal und ist nur über `localhost` erreichbar
+- No data ever leaves your browser (except price requests to Yahoo Finance / OpenFIGI)
+- CSV data is stored exclusively in `localStorage`
+- The price server runs locally and is only accessible via `localhost`
