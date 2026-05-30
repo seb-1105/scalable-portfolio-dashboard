@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&display=swap');
+
+:root {
+  --bg:       #f5f2eb;
+  --surface:  #faf8f3;
+  --border:   #e2ddd4;
+  --ink:      #1a1814;
+  --muted:    #8a8478;
+  --green:    #1d6b3e;
+  --green-bg: #e8f5ee;
+  --red:      #8b2020;
+  --red-bg:   #fceaea;
+  --gold:     #b07d2a;
+  --gold-bg:  #fdf3de;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 48px 32px;
+}
+
+.page { max-width: 1100px; margin: 0 auto; }
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--ink);
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.header-right {
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* ── API BAR ── */
+.api-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.api-bar label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.api-bar input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+.api-bar input:focus { border-color: var(--ink); }
+
+/* ── BUTTONS ── */
+btn, .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.8; }
+.btn.secondary { background: transparent; color: var(--ink); }
+.btn.ghost { background: transparent; color: var(--muted); border-color: var(--border); }
+.btn.ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ── IMPORT SECTION ── */
+.import-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.drop-zone {
+  flex: 1;
+  min-width: 260px;
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  transition: all 0.2s;
+  position: relative;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--surface);
+}
+.drop-zone input { position: absolute; inset:0; opacity:0; cursor:pointer; }
+
+/* ── SUMMARY CARDS ── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.card-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.card-value.green { color: var(--green); }
+.card-value.red   { color: var(--red); }
+.card-value.gold  { color: var(--gold); }
+
+.card-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── STACKED BAR ── */
+.bar-section {
+  margin-bottom: 40px;
+}
+
+.bar-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+
+.stacked-bar {
+  height: 36px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  border: 1px solid var(--border);
+}
+
+.bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  transition: width 0.6s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 8px;
+}
+
+.bar-segment.capital { background: var(--ink); color: var(--bg); }
+.bar-segment.profit  { background: var(--green); color: #fff; }
+.bar-segment.loss    { background: var(--red); color: #fff; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+thead th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 2px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+thead th:hover { color: var(--ink); }
+thead th.sorted { color: var(--ink); }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:hover { background: var(--surface); }
+
+td {
+  padding: 12px 14px;
+  vertical-align: middle;
+}
+
+.sym {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.sym-name {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.pill.green { background: var(--green-bg); color: var(--green); }
+.pill.red   { background: var(--red-bg);   color: var(--red); }
+
+/* mini stacked bar per row */
+.mini-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100px;
+  background: var(--border);
+}
+.mini-bar .cap { background: var(--ink); }
+.mini-bar .pro { background: var(--green); }
+.mini-bar .los { background: var(--red); }
+
+/* donut chart area */
+.chart-area {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+canvas#donut {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+.legend { flex: 1; min-width: 200px; }
+.legend-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.legend-sym { font-weight: 500; min-width: 60px; }
+.legend-pct { margin-left: auto; color: var(--muted); }
+.legend-val { min-width: 80px; text-align: right; }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.empty p { font-size: 12px; line-height: 1.8; }
+
+/* ── MANUAL ADD ── */
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.add-row input, .add-row select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+.add-row input:focus, .add-row select:focus { border-color: var(--ink); }
+.add-row input::placeholder { color: var(--muted); }
+
+/* status */
+.status-bar {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  min-height: 18px;
+}
+.status-bar.loading { color: var(--gold); }
+.status-bar.ok      { color: var(--green); }
+.status-bar.err     { color: var(--red); }
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 16px;
+  color: var(--ink);
+}
+
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+/* animate in */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.animate { animation: fadeUp 0.4s ease both; }
+
+/* ── CHART TOOLTIP ── */
+#chartTooltip, #posTooltip {
+  display: none;
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 11px;
+  min-width: 210px;
+  max-width: 340px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 1001;
+  pointer-events: none;
+  line-height: 1.7;
+}
+#posTooltip .tt-section { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; margin-top: 6px; margin-bottom: 2px; }
+#posTooltip .tt-row { display: flex; justify-content: space-between; gap: 10px; }
+#posTooltip .tt-row span:last-child { font-variant-numeric: tabular-nums; }
+.sold-row { opacity: 0.62; filter: grayscale(0.72); }
+.sold-row .sym { text-decoration: line-through; color: var(--muted) !important; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div>
+      <h1>Portfolio<br><em>Übersicht</em></h1>
+    </div>
+    <div class="header-right">
+      <div id="last-update">Noch nicht geladen</div>
+      <div>Lokal · Keine Daten verlassen deinen Browser · Alle Kurse in EUR</div>
+    </div>
+  </header>
+
+  <!-- API Key -->
+  <div class="api-bar">
+    <label>FINNHUB API KEY</label>
+    <input type="password" id="apiKey" placeholder="Kostenlos unter finnhub.io/register" />
+    <button class="btn secondary" onclick="saveKey()">Speichern</button>
+    <button class="btn ghost" onclick="refreshAll()">↻ Kurse aktualisieren</button>
+    <span id="serverStatus" style="font-size:10px;padding:3px 8px;border-radius:3px;background:var(--border);color:var(--muted);white-space:nowrap">Kursserver ○</span>
+  </div>
+
+  <!-- Import + Manual Add -->
+  <div class="section-title">Positionen</div>
+
+  <div class="import-section">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="csvFile" accept=".csv" onchange="handleCSV(event)">
+      📂 Scalable Transaktionshistorie (CSV) ablegen<br><small style="font-size:10px">Konto → Transaktionen → Export</small>
+    </div>
+    <button class="btn secondary" onclick="document.getElementById('csvFile').click()">CSV importieren</button>
+    <button class="btn ghost" onclick="loadDemo()">Demo-Daten laden</button>
+    <button class="btn ghost" onclick="clearAll()">✕ Alles löschen</button>
+  </div>
+
+  <div class="add-row">
+    <input type="text"   id="inSym"   placeholder="Symbol (z.B. AAPL)" style="width:130px">
+    <input type="text"   id="inName"  placeholder="Name"                style="width:160px">
+    <input type="number" id="inShares" placeholder="Anzahl Stück"       style="width:120px">
+    <input type="number" id="inCost"   placeholder="Ø Kaufpreis (€)"    style="width:150px">
+    <button class="btn" onclick="addManual()">+ Hinzufügen</button>
+  </div>
+
+  <div class="status-bar" id="statusBar"></div>
+
+  <!-- Summary -->
+  <div class="summary-grid" id="summaryGrid" style="display:none">
+    <div class="card animate">
+      <div class="card-label">Investiertes Kapital</div>
+      <div class="card-value gold" id="sumCapital">–</div>
+      <div class="card-sub">Eigenkapital / Einstandswert</div>
+    </div>
+    <div class="card animate" style="animation-delay:0.05s">
+      <div class="card-label">Aktueller Wert</div>
+      <div class="card-value" id="sumValue">–</div>
+      <div class="card-sub">Marktbewertung heute</div>
+    </div>
+    <div class="card animate" style="animation-delay:0.1s">
+      <div class="card-label">Gesamtgewinn / -verlust</div>
+      <div class="card-value" id="sumPnL">–</div>
+      <div class="card-sub" id="sumPnLPct">–</div>
+    </div>
+    <div class="card animate" style="animation-delay:0.15s">
+      <div class="card-label">Unrealisierter G/V</div>
+      <div class="card-value" id="sumUnrealized">–</div>
+      <div class="card-sub" id="sumUnrealizedSub">–</div>
+    </div>
+    <div class="card animate" style="animation-delay:0.2s">
+      <div class="card-label">Positionen</div>
+      <div class="card-value" id="sumCount">–</div>
+      <div class="card-sub" id="sumWinLoss">–</div>
+    </div>
+  </div>
+
+  <!-- Stacked bar -->
+  <div class="bar-section" id="barSection" style="display:none">
+    <div class="bar-title">Kapital vs. Gewinn/Verlust</div>
+    <div class="stacked-bar">
+      <div class="bar-segment capital" id="barCapital"></div>
+      <div class="bar-segment profit"  id="barProfit" style="display:none"></div>
+      <div class="bar-segment loss"    id="barLoss"   style="display:none"></div>
+    </div>
+  </div>
+
+  <hr class="divider" id="divider1" style="display:none">
+
+  <!-- Donut chart + legend -->
+  <div class="chart-area" id="chartArea" style="display:none">
+    <div>
+      <div class="section-title" style="margin-bottom:8px">Anteil je Aktie</div>
+      <canvas id="donut" width="200" height="200"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-title">Verteilung nach aktuellem Wert</div>
+      <div id="legendItems"></div>
+    </div>
+  </div>
+
+  <hr class="divider" id="divider2" style="display:none">
+
+  <!-- Table -->
+  <div id="tableSection" style="display:none">
+    <div class="section-title">Einzelpositionen</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('symbol')">Symbol</th>
+            <th onclick="sortBy('shares')">Stück</th>
+            <th onclick="sortBy('totalBought')" title="Gesamt gekaufte Anteile laut CSV">Gek.</th>
+            <th onclick="sortBy('avgCost')">Ø Kauf</th>
+            <th onclick="sortBy('currentPrice')">Kurs</th>
+            <th onclick="sortBy('capital')">Kapital</th>
+            <th onclick="sortBy('value')">Wert</th>
+            <th onclick="sortBy('pnl')">G/V</th>
+            <th onclick="sortBy('pnlPct')">G/V %</th>
+            <th>Kap vs. G/V</th>
+            <th onclick="sortBy('portfolioPct')">Anteil</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Monthly PnL Chart -->
+  <div id="monthlySection" style="display:none">
+    <hr class="divider">
+    <div class="section-title">Realisierter Gewinn / Verlust pro Monat</div>
+    <div style="margin-bottom:8px;font-size:11px;color:var(--muted)">
+      Basiert auf deinen CSV-Transaktionen · Kaufpreis × verkaufte Stücke vs. Verkaufspreis (FIFO)
+    </div>
+    <canvas id="monthlyChart" style="width:100%;max-height:260px"></canvas>
+    <div id="monthlyTable" style="margin-top:24px"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty" id="emptyState">
+    <h3>Noch keine Positionen</h3>
+    <p>Importiere eine CSV aus Scalable Capital<br>oder füge Positionen manuell hinzu.<br><br>
+    Pro Zeile brauchst du: Symbol · Stückzahl · Durchschnittlicher Kaufpreis</p>
+  </div>
+
+</div>
+
+<div id="chartTooltip"></div>
+<div id="posTooltip"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let positions    = JSON.parse(localStorage.getItem('pf_positions')    || '[]');
+let transactions = JSON.parse(localStorage.getItem('pf_transactions') || '[]');
+let apiKey       = localStorage.getItem('pf_apikey') || '';
+let sortCol      = 'value';
+let sortAsc      = false;
+
+if (apiKey) document.getElementById('apiKey').value = apiKey;
+
+// ─── PALETTE for donut ───────────────────────────────────────────────────────
+const PALETTE = ['#1a1814','#b07d2a','#1d6b3e','#8b2020','#4a6fa5',
+                 '#6b4fa5','#a5704a','#2a7a6b','#7a2a5b','#4a7a2a',
+                 '#a5a02a','#2a4a7a','#7a5a2a','#2a7a2a','#5a2a7a'];
+
+// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('pf_positions',    JSON.stringify(positions));
+  localStorage.setItem('pf_transactions', JSON.stringify(transactions));
+}
+
+function saveKey() {
+  apiKey = document.getElementById('apiKey').value.trim();
+  localStorage.setItem('pf_apikey', apiKey);
+  setStatus('API Key gespeichert ✓', 'ok');
+}
+
+// ─── CSV IMPORT ───────────────────────────────────────────────────────────────
+function handleCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => parseCSV(ev.target.result);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text) {
+  // ── Scalable Capital Transaktionshistorie ──────────────────────────────────
+  // Format: date;time;status;reference;description;assetType;type;isin;shares;price;amount;fee;tax;currency
+  // Strategie: alle "executed" Buy/Savings-Plan-Käufe aufaddieren,
+  //            Verkäufe abziehen, Ø Kaufpreis per WACC berechnen.
+
+  // ── Sauberer Neustart: alte Positionen + Transaktionen verwerfen ────────────
+  positions    = [];
+  transactions = [];
+
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { setStatus('CSV leer oder ungültig', 'err'); return; }
+
+  // Trennzeichen erkennen: Semikolon oder Komma
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const splitLine = l => l.split(sep).map(c => c.trim().replace(/^"|"$/g, ''));
+
+  const header = splitLine(lines[0]).map(h => h.toLowerCase());
+
+  const ci = name => header.indexOf(name);
+
+  // Spalten-Indizes
+  const iStatus  = ci('status');
+  const iDesc    = ci('description');
+  const iType    = ci('type');
+  const iIsin    = ci('isin');
+  const iShares  = ci('shares');
+  const iPrice   = ci('price');
+  const iAmount  = ci('amount');
+
+  // Mindestanforderung
+  if (iType === -1 || iShares === -1) {
+    setStatus(`Spalten nicht erkannt. Gefundene Header: ${header.join(', ')}`, 'err');
+    return;
+  }
+
+  const toNum = v => {
+    if (!v || v === '' || v === '-') return 0;
+    // Europäisches Format: 1.234,56 → 1234.56
+    const s = v.replace(/\./g,'').replace(',','.');
+    return parseFloat(s) || 0;
+  };
+
+  // Transaktionstypen die Käufe sind
+  const isBuy  = t => /buy|savings.?plan|sparplan|kauf|einmalanlage/i.test(t);
+  const isSell = t => /sell|verkauf/i.test(t);
+  const isRelevant = t => isBuy(t) || isSell(t);
+
+  // Map: isin → { name, totalShares, totalCost (Kaufwert für WACC) }
+  const book = {};
+
+  let rowsProcessed = 0;
+
+  // Spalten-Indizes für Datum/Zeit
+  const iDate = header.indexOf('date');
+  const iTime = header.indexOf('time');
+
+  // ── Alle relevanten Zeilen sammeln ──────────────────────────────────────────
+  // Scalable CSV ist neueste-zuerst → ohne Sortierung kämen Verkäufe vor Käufen,
+  // und totalShares würde falsch berechnet (Sell kann nichts abziehen wenn Buy noch nicht da).
+  const rawRows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitLine(lines[i]);
+    if (cols.length < 4) continue;
+
+    const status = iStatus !== -1 ? (cols[iStatus] || '').toLowerCase() : 'executed';
+    if (status && status !== 'executed') continue;
+
+    const type = iType !== -1 ? (cols[iType] || '') : '';
+    if (!isRelevant(type)) continue;
+
+    const isin   = iIsin !== -1 ? (cols[iIsin] || '').trim() : '';
+    const desc   = iDesc !== -1 ? (cols[iDesc] || '').trim() : isin;
+    const shares = Math.abs(toNum(cols[iShares]));
+    const price  = toNum(cols[iPrice]);
+    const amount = Math.abs(toNum(iAmount !== -1 ? cols[iAmount] : '0'));
+
+    if (!isin || shares === 0) continue;
+
+    const unitPrice = price > 0 ? price : (shares > 0 ? amount / shares : 0);
+
+    // Datum normalisieren für Sortierung
+    const rawDate = iDate !== -1 ? cols[iDate] : '';
+    const rawTime = iTime !== -1 ? cols[iTime] : '';
+    let dateISO = rawDate;
+    const dmy = rawDate.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+    if (dmy) {
+      let yr = parseInt(dmy[3]);
+      if (yr < 100) yr += 2000;
+      dateISO = `${yr}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+    }
+
+    rawRows.push({ isin, desc, type, shares, unitPrice, dateISO, rawTime });
+  }
+
+  // Älteste zuerst → Käufe kommen vor Verkäufen, WACC korrekt
+  rawRows.sort((a, b) => {
+    const d = a.dateISO.localeCompare(b.dateISO);
+    return d !== 0 ? d : a.rawTime.localeCompare(b.rawTime);
+  });
+
+  // ── In chronologischer Reihenfolge verarbeiten ───────────────────────────────
+  for (const row of rawRows) {
+    const { isin, desc, type, shares, unitPrice } = row;
+
+    if (!book[isin]) {
+      book[isin] = { name: desc, isin, totalShares: 0, totalCost: 0 };
+    }
+
+    const entry = book[isin];
+
+    if (isBuy(type)) {
+      // WACC: neuer Ø = (alter Bestand × alter Ø + neue Stücke × Preis) / neue Stücke gesamt
+      entry.totalCost   += shares * unitPrice;
+      entry.totalShares += shares;
+      entry.totalBought  = (entry.totalBought || 0) + shares;
+    } else if (isSell(type)) {
+      // Bei Verkauf: Stücke reduzieren, anteiligen Kostenbasis abziehen
+      const avgBefore = entry.totalShares > 0 ? entry.totalCost / entry.totalShares : 0;
+      const realizedThisSell = shares * (unitPrice - avgBefore);
+      entry.realizedPnL  = (entry.realizedPnL || 0) + realizedThisSell;
+      entry.totalShares  = Math.max(0, entry.totalShares - shares);
+      entry.totalCost    = entry.totalShares * avgBefore;
+      entry.hadSell      = true;
+    }
+
+    rowsProcessed++;
+  }
+
+  // Nur Positionen mit Bestand > 0 übernehmen
+  let imported = 0, soldCount = 0;
+  for (const [isin, entry] of Object.entries(book)) {
+    if (entry.totalShares < 0.0001) continue; // vollständig verkauft → separater Block
+
+    const avgCost = entry.totalShares > 0 ? entry.totalCost / entry.totalShares : 0;
+
+    const existing = positions.findIndex(p => p.symbol === isin || p.isin === isin);
+    const pos = {
+      symbol:       isin,
+      name:         entry.name,
+      isin:         isin,
+      shares:       Math.round(entry.totalShares * 10000) / 10000,
+      totalBought:  Math.round((entry.totalBought || 0) * 10000) / 10000,
+      avgCost:      Math.round(avgCost * 10000) / 10000,
+      currentPrice: null
+    };
+
+    if (existing >= 0) positions[existing] = pos;
+    else positions.push(pos);
+    imported++;
+  }
+
+  // Vollständig verkaufte Positionen separat (für Tabelle + Gewinnausweis)
+  for (const [isin, entry] of Object.entries(book)) {
+    if (entry.totalShares >= 0.0001) continue;    // noch gehalten
+    // Nur anzeigen wenn es tatsächlich Verkäufe gab (book hat entry und sells wurden erkannt)
+    if (!entry.hadSell) continue;
+
+    const existing = positions.findIndex(p => p.symbol === isin || p.isin === isin);
+    const pos = {
+      symbol:       isin,
+      name:         entry.name,
+      isin:         isin,
+      shares:       0,
+      avgCost:      0,
+      currentPrice: null,
+      sold:         true,
+      realizedPnL:  Math.round((entry.realizedPnL || 0) * 100) / 100,
+    };
+
+    if (existing >= 0) positions[existing] = pos;
+    else positions.push(pos);
+    soldCount++;
+  }
+
+  // Rohe Transaktionen für Monatsauswertung speichern
+  // Wir lesen nochmal alle executed buy/sell Zeilen mit Datum
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitLine(lines[i]);
+    if (cols.length < 4) continue;
+    const status = iStatus !== -1 ? (cols[iStatus] || '').toLowerCase() : 'executed';
+    if (status !== 'executed') continue;
+    const type = iType !== -1 ? (cols[iType] || '') : '';
+    if (!isRelevant(type)) continue;
+
+    const rawDate = iDate !== -1 ? cols[iDate] : '';
+    const isin  = iIsin !== -1 ? cols[iIsin]?.trim() : '';
+    const desc  = iDesc !== -1 ? cols[iDesc]?.trim() : '';
+    const shares = Math.abs(toNum(cols[iShares]));
+    const price  = toNum(cols[iPrice]);
+    const amount = Math.abs(toNum(iAmount !== -1 ? cols[iAmount] : '0'));
+    const unitPrice = price > 0 ? price : (shares > 0 ? amount / shares : 0);
+
+    if (!rawDate || !isin || shares === 0) continue;
+
+    // Datum normalisieren: DD.MM.YY oder DD.MM.YYYY oder YYYY-MM-DD
+    let dateISO = rawDate;
+    const dmy = rawDate.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+    if (dmy) {
+      let yr = parseInt(dmy[3]);
+      if (yr < 100) yr += 2000;
+      dateISO = `${yr}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+    }
+
+    transactions.push({
+      date:   dateISO,
+      isin:   isin,
+      name:   desc,
+      type:   isBuy(type) ? 'buy' : 'sell',
+      shares,
+      price:  unitPrice,
+      amount: shares * unitPrice,
+    });
+  }
+
+  save();
+
+  if (imported === 0 && rowsProcessed === 0) {
+    setStatus('Keine ausgeführten Kauf-/Verkaufstransaktionen gefunden. Prüfe Status-Spalte (executed) und Type-Spalte (buy/sell).', 'err');
+  } else if (imported === 0) {
+    setStatus(`${rowsProcessed} Transaktionen verarbeitet, aber alle Positionen wurden vollständig verkauft.`, 'err');
+  } else {
+    const soldMsg = soldCount > 0 ? ` · ${soldCount} vollständig verkauft` : '';
+    setStatus(`✓ ${imported} aktive Positionen${soldMsg} aus ${rowsProcessed} Transaktionen importiert.`, 'ok');
+    renderMonthlyChart();
+    refreshAll();
+  }
+}
+
+// ─── MANUAL ADD ──────────────────────────────────────────────────────────────
+function addManual() {
+  const sym    = document.getElementById('inSym').value.trim().toUpperCase();
+  const name   = document.getElementById('inName').value.trim() || sym;
+  const shares = parseFloat(document.getElementById('inShares').value);
+  const cost   = parseFloat(document.getElementById('inCost').value);
+
+  if (!sym || isNaN(shares) || shares <= 0 || isNaN(cost) || cost <= 0) {
+    setStatus('Bitte Symbol, Stückzahl und Kaufpreis eingeben', 'err'); return;
+  }
+
+  const existing = positions.findIndex(p => p.symbol === sym);
+  const pos = { symbol: sym, name, shares, avgCost: cost, currentPrice: null };
+  if (existing >= 0) positions[existing] = pos;
+  else positions.push(pos);
+
+  save();
+  document.getElementById('inSym').value = '';
+  document.getElementById('inName').value = '';
+  document.getElementById('inShares').value = '';
+  document.getElementById('inCost').value = '';
+  setStatus(`${sym} hinzugefügt`, 'ok');
+  refreshAll();
+}
+
+// ─── DEMO DATA ───────────────────────────────────────────────────────────────
+function loadDemo() {
+  positions = [
+    { symbol:'AAPL',  name:'Apple Inc.',        shares:10, avgCost:155.00, currentPrice:null },
+    { symbol:'NVDA',  name:'NVIDIA Corp.',       shares:5,  avgCost:420.00, currentPrice:null },
+    { symbol:'RZLV',  name:'Rezolve AI',         shares:200,avgCost:3.20,  currentPrice:null },
+    { symbol:'DRSHF', name:'DroneShield',        shares:500,avgCost:0.85,  currentPrice:null },
+    { symbol:'MSFT',  name:'Microsoft Corp.',    shares:8,  avgCost:310.00, currentPrice:null },
+    { symbol:'AMZN',  name:'Amazon.com Inc.',    shares:6,  avgCost:135.00, currentPrice:null },
+  ];
+  save();
+  setStatus('Demo-Daten geladen', 'ok');
+  refreshAll();
+}
+
+function clearAll() {
+  if (!confirm('Alle Positionen löschen?')) return;
+  positions = [];
+  transactions = [];
+  save();
+  render();
+  renderMonthlyChart();
+}
+
+// ─── ISIN → TICKER LOOKUP (OpenFIGI Batch + Finnhub Fallback) ────────────────
+// Cache-Version: bei Änderungen erhöhen, damit alter Cache automatisch ungültig wird
+const TICKER_CACHE_VERSION = 2;
+const _rawCache = JSON.parse(localStorage.getItem('pf_tickercache') || '{}');
+const tickerCache = (_rawCache.__version === TICKER_CACHE_VERSION) ? _rawCache : { __version: TICKER_CACHE_VERSION };
+
+function saveTickerCache() {
+  tickerCache.__version = TICKER_CACHE_VERSION;
+  localStorage.setItem('pf_tickercache', JSON.stringify(tickerCache));
+}
+
+function isISIN(s) {
+  return /^[A-Z]{2}[A-Z0-9]{10}$/.test(s);
+}
+
+// OpenFIGI exchCode → Yahoo Finance Ticker-Suffix
+// Quelle: https://www.openfigi.com/api#post-v3-mapping
+const FIGI_EXCH_SUFFIX = {
+  // US-Börsen (kein Suffix nötig)
+  'US': '', 'UN': '', 'UW': '', 'UQ': '', 'UA': '', 'UR': '', 'UV': '',
+  // Europa
+  'GY': '.DE',  // XETRA
+  'GF': '.F',   // Frankfurt
+  'LN': '.L',   // London Stock Exchange
+  'FP': '.PA',  // Euronext Paris
+  'NA': '.AS',  // Euronext Amsterdam
+  'SE': '.SW',  // SIX Swiss Exchange
+  'IT': '.MI',  // Borsa Italiana
+  'SM': '.MC',  // Bolsa Madrid
+  'SS': '.ST',  // Nasdaq Stockholm
+  'DC': '.CO',  // Nasdaq Copenhagen
+  'HE': '.HE',  // Nasdaq Helsinki
+  'OL': '.OL',  // Oslo Bors
+  'VI': '.VI',  // Wiener Börse
+  // Rest der Welt
+  'AU': '.AX',  // ASX (Australien)
+  'AT': '.AX',  // ASX (alt)
+  'CN': '.TO',  // Toronto Stock Exchange
+  'TT': '.TO',  // Toronto (alt)
+  'HK': '.HK',  // Hong Kong Exchange
+  'TK': '.T',   // Tokyo Stock Exchange
+  'SI': '.SI',  // Singapore Exchange
+};
+
+// OpenFIGI Batch: löst bis zu 100 ISINs auf einmal auf (kostenlos, kein Key nötig)
+async function resolveISINsBatch(isins) {
+  try {
+    const body = isins.map(isin => ({ idType: 'ID_ISIN', idValue: isin }));
+    const r = await fetch('https://api.openfigi.com/v3/mapping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    const result = {};
+    isins.forEach((isin, i) => {
+      const entry = data[i];
+      if (!entry || entry.error || entry.warning) return;
+      const items = entry.data || [];
+
+      // Bevorzuge: Common Stock/ETF auf bekannter Börse (exchCode vorhanden)
+      // Ticker darf Punkt enthalten – wir bauen das Suffix selbst via FIGI_EXCH_SUFFIX
+      const best =
+        items.find(x => ['Common Stock','ETP','ETF'].includes(x.securityType2) && x.ticker && x.exchCode in FIGI_EXCH_SUFFIX)
+        || items.find(x => x.ticker && x.exchCode in FIGI_EXCH_SUFFIX)
+        || items.find(x => x.ticker && !x.ticker.includes('.'))
+        || items[0];
+
+      if (best?.ticker) {
+        // Basis-Ticker aus OpenFIGI (enthält manchmal bereits einen Punkt)
+        const baseTicker = best.ticker.split('.')[0];
+        const suffix = FIGI_EXCH_SUFFIX[best.exchCode] ?? '';
+        result[isin] = { ticker: baseTicker + suffix, name: best.name || '' };
+      }
+    });
+    return result;
+  } catch { return {}; }
+}
+
+// Einzelner Finnhub-Lookup als Fallback
+async function resolveViaFinnhub(isin) {
+  try {
+    const r = await fetch(
+      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(isin)}&token=${apiKey}`
+    );
+    const d = await r.json();
+    if (d.result && d.result.length > 0) {
+    const best = d.result.find(x => x.type === 'Common Stock' && !x.symbol.includes('.'))
+                || d.result.find(x => !x.symbol.includes('.'))
+                || d.result.find(x => (x.symbol.match(/\./g) || []).length <= 1)
+                || null; // Multi-Punkt-Tickers (z.B. VSN7X1.F.IR) ablehnen
+      return best ? { ticker: best.symbol, name: best.description || '' } : null;
+    }
+  } catch {}
+  return null;
+}
+
+async function resolveAllISINs(posList) {
+  // ISINs die noch nicht im Cache sind
+  const uncached = posList
+    .filter(p => isISIN(p.symbol) && !tickerCache[p.symbol] && !p.sold)
+    .map(p => p.symbol);
+
+  if (uncached.length > 0) {
+    setStatus(`Löse ${uncached.length} ISINs auf (OpenFIGI)…`, 'loading');
+    // Batch in 100er Pakete aufteilen
+    for (let i = 0; i < uncached.length; i += 100) {
+      const chunk = uncached.slice(i, i + 100);
+      const resolved = await resolveISINsBatch(chunk);
+      for (const [isin, info] of Object.entries(resolved)) {
+        tickerCache[isin] = info.ticker;
+        // Namen aktualisieren
+        const pos = posList.find(p => p.symbol === isin || p.isin === isin);
+        if (pos && (!pos.name || pos.name === isin) && info.name) pos.name = info.name;
+      }
+      if (i + 100 < uncached.length) await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Fallback: was OpenFIGI nicht kannte → Finnhub Search
+    const stillMissing = uncached.filter(isin => !tickerCache[isin]);
+    for (const isin of stillMissing) {
+      const info = await resolveViaFinnhub(isin);
+      if (info) {
+        tickerCache[isin] = info.ticker;
+        const pos = posList.find(p => p.symbol === isin || p.isin === isin);
+        if (pos && (!pos.name || pos.name === isin) && info.name) pos.name = info.name;
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    saveTickerCache();
+  }
+
+  // Ticker auf Positionen anwenden
+  for (const pos of posList) {
+    if (isISIN(pos.symbol)) {
+      pos.resolvedTicker = tickerCache[pos.symbol] || null;
+    } else {
+      pos.resolvedTicker = pos.symbol;
+    }
+  }
+}
+
+// ─── WÄHRUNGS-KONVERTIERUNG ──────────────────────────────────────────────────
+// ─── LOKALER YFINANCE-SERVER ────────────────────────────────────────────────────────────────────
+// python3 price_server.py startet den Server auf localhost:8765
+// Alle Welthörsen, kein CORS-Problem – wird als erste Kursquelle genutzt
+
+const localPriceCache = {}; // { "ASML.AS": { price, currency }, ... }
+
+async function fetchPricesFromLocalServer(tickers) {
+  if (!tickers.length) return;
+  try {
+    const r = await fetch(
+      `http://localhost:8765/prices?tickers=${encodeURIComponent(tickers.join(','))}`,
+      { signal: AbortSignal.timeout(6000) }
+    );
+    if (!r.ok) return;
+    const data = await r.json();
+    let count = 0;
+    for (const [ticker, info] of Object.entries(data)) {
+      localPriceCache[ticker] = info;
+      count++;
+    }
+    const el = document.getElementById('serverStatus');
+    if (el) {
+      el.textContent = `Kursserver ● ${count} Kurse`;
+      el.style.background = 'var(--green-bg)';
+      el.style.color = 'var(--green)';
+    }
+    console.log(`Lokaler Server: ${count}/${tickers.length} Kurse geladen`);
+  } catch {
+    // Server nicht aktiv → still weiter mit Yahoo/Finnhub
+    const el = document.getElementById('serverStatus');
+    if (el) { el.textContent = 'Kursserver ○'; el.style.background = ''; el.style.color = ''; }
+  }
+}
+
+let fxRates = {}; // { USD: 0.92, GBP: 1.17, ... } → Faktor zu EUR
+
+async function loadFXRates() {
+  try {
+    // open.er-api.com: kostenlos, kein Key nötig, CORS-freundlich
+    const r = await fetch('https://open.er-api.com/v6/latest/EUR');
+    const d = await r.json();
+    // Invertieren: wir wollen "1 USD = X EUR" (API liefert "1 EUR = X USD")
+    const rates = {};
+    for (const [currency, rate] of Object.entries(d.rates)) {
+      rates[currency] = 1 / rate; // z.B. USD: 1/1.164 = 0.859
+    }
+    rates['EUR'] = 1.0;
+    rates['GBp'] = 1 / (d.rates['GBP'] * 100); // Pence → EUR
+    rates['GBX'] = 1 / (d.rates['GBP'] * 100); // Pence-Variante
+    fxRates = rates;
+    console.log('FX Rates geladen:', fxRates);
+  } catch (e) {
+    console.warn('FX Rates konnten nicht geladen werden:', e);
+    // Fallback: grobe Schätzwerte
+    fxRates = {
+      EUR: 1.0,
+      USD: 0.92, CAD: 0.68, AUD: 0.60, NZD: 0.55,
+      GBP: 1.17, CHF: 1.05, NOK: 0.086, SEK: 0.088, DKK: 0.134,
+      JPY: 0.0061, HKD: 0.116, SGD: 0.68, CNY: 0.127,
+      GBp: 0.0117, GBX: 0.0117,
+    };
+  }
+}
+
+function toEUR(price, currency) {
+  if (!currency || currency === 'EUR') return price;
+  const rate = fxRates[currency];
+  if (!rate) {
+    console.warn(`Kein FX-Kurs für ${currency}, kein Umrechnung`);
+    return price; // unbekannte Währung: unverändert lassen
+  }
+  return price * rate;
+}
+
+// ─── PRICE FETCHING ──────────────────────────────────────────────────────────
+// Strategie: Yahoo Finance als primäre Quelle (liefert Währung zuverlässig),
+//            Finnhub als Fallback für US-Aktien ohne Exchange-Suffix.
+//
+// Yahoo-Ticker-Logik:
+//   - Hat der Ticker bereits einen Punkt (z.B. DRO.AX, ASML.AS) → direkt verwenden
+//   - Kein Punkt → US-Aktie, probiere direkt + gängige EU-Suffixe als Fallback
+
+const yahooCache = {}; // { ticker: { price, currency } }
+
+async function fetchPriceYahoo(ticker) {
+  if (!ticker) return null;
+  if (yahooCache[ticker]) return yahooCache[ticker];
+
+  const hasSuffix = ticker.includes('.');
+
+  // Wenn Ticker schon Exchange-Suffix hat (via FIGI_EXCH_SUFFIX) → nur diesen Versuch
+  // Wenn nicht → US direkt + gängige Börsen-Fallbacks
+  const variants = hasSuffix
+    ? [ticker]
+    : [ticker, ticker+'.DE', ticker+'.L', ticker+'.PA', ticker+'.AS',
+       ticker+'.SW', ticker+'.F', ticker+'.AX', ticker+'.TO',
+       ticker+'.MI', ticker+'.MC', ticker+'.ST', ticker+'.HK'];
+
+  for (const v of variants) {
+    // query2 ist oft stabiler als query1 bei CORS; beide versuchen
+    for (const host of ['query2', 'query1']) {
+      try {
+        const r = await fetch(
+          `https://${host}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(v)}?interval=1d&range=1d`,
+          { headers: { 'Accept': 'application/json' } }
+        );
+        const d = await r.json();
+        const meta     = d?.chart?.result?.[0]?.meta;
+        let   price    = meta?.regularMarketPrice;
+        let   currency = meta?.currency;
+        if (!price || price <= 0 || !currency) continue;
+
+        // Absicherung: Yahoo gibt manchmal 'GBP' zurück, meint aber GBp (Pence).
+        // Erkennung: Ticker endet auf .L UND Preis typischerweise > 400 für GBp-Werte.
+        if (currency === 'GBP' && v.endsWith('.L') && price > 400) {
+          price /= 100;
+          currency = 'GBp';
+        }
+
+        const result = { price, currency };
+        yahooCache[ticker] = result;
+        return result;
+      } catch {}
+    }
+  }
+  return null;
+}
+
+async function fetchPriceFinnhub(ticker) {
+  // Malformed Tickers mit mehreren Punkten (z.B. VSN7X1.F.IR) ablehnen
+  if (!apiKey || !ticker || (ticker.match(/\./g) || []).length > 1) return null;
+  try {
+    const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`);
+    const d = await r.json();
+    if (!d.c || d.c <= 0) return null;
+    // Währung aus Exchange-Suffix ableiten (Finnhub liefert keine Währung im Quote-Endpoint)
+    const suffix = ticker.includes('.') ? ticker.split('.').pop().toUpperCase() : '';
+    const SUFFIX_CCY = {
+      'DE':'EUR','F':'EUR','AS':'EUR','PA':'EUR','MI':'EUR','MC':'EUR','VI':'EUR',
+      'CO':'DKK','HE':'EUR','OL':'NOK','ST':'SEK',
+      'L':'GBp',  // London: Pence
+      'SW':'CHF','AX':'AUD','TO':'CAD','HK':'HKD','T':'JPY','SI':'SGD',
+    };
+    const currency = SUFFIX_CCY[suffix] || 'USD';
+    return { price: d.c, currency };
+  } catch { return null; }
+}
+
+async function fetchPrice(ticker) {
+  if (!ticker) return null;
+  // 0. Lokaler yfinance-Server (wenn aktiv → beste Quelle, alle Welthörsen)
+  if (localPriceCache[ticker]) {
+    const lp = localPriceCache[ticker];
+    return toEUR(lp.price, lp.currency);
+  }
+  // 1. Yahoo Finance — CORS-blockiert im Browser (funktioniert nur über lokalen Server)
+  const r1 = await fetchPriceYahoo(ticker);
+  if (r1) return toEUR(r1.price, r1.currency);
+  // 2. Finnhub Fallback (alle Ticker; Währung wird aus Exchange-Suffix abgeleitet)
+  const r2 = await fetchPriceFinnhub(ticker);
+  if (r2) return toEUR(r2.price, r2.currency);
+  return null;
+}
+
+// ─── REFRESH ALL ─────────────────────────────────────────────────────────────
+async function refreshAll() {
+  if (!apiKey) {
+    setStatus('Kein API Key — Kurse werden nicht geladen (nur Kaufwerte sichtbar)', 'loading');
+    render(); return;
+  }
+  if (positions.length === 0) { render(); return; }
+
+  // Schritt 0: Wechselkurse laden (open.er-api.com, kostenlos)
+  setStatus('Lade Wechselkurse…', 'loading');
+  await loadFXRates();
+
+  // Schritt 1: ISINs auflösen (nur aktive Positionen)
+  await resolveAllISINs(positions);
+
+  // Auch ISINs ohne aufgelösten Ticker mitsenden – yfinance versteht ISINs direkt
+  const activeTickers = positions
+    .filter(p => !p.sold && (p.resolvedTicker || isISIN(p.symbol)))
+    .map(p => p.resolvedTicker || p.symbol);
+
+  // Schritt 1b: Batch-Preisabfrage beim lokalen yfinance-Server
+  setStatus('Frage lokalen Kursserver ab…', 'loading');
+  await fetchPricesFromLocalServer(activeTickers);
+
+  const resolved = positions.filter(p => !p.sold && p.resolvedTicker).length;
+  const failed   = positions.filter(p => !p.sold && !p.resolvedTicker).length;
+  setStatus(`Lade ${resolved} Kurse… (${failed > 0 ? failed + ' ISIN(s) nicht aufgelöst' : 'alle ISINs erkannt'})`, 'loading');
+
+  // Schritt 2: Kurse laden (Fallback für nicht vom lokalen Server gelieferte Tickers)
+  for (const pos of positions) {
+    if (pos.sold) continue; // keine Kurse für verkaufte Positionen
+    // Wenn ISIN-Auflösung scheiterte, ISIN direkt nutzen (yfinance/Server versteht ISINs)
+    const tickerKey = pos.resolvedTicker || (isISIN(pos.symbol) ? pos.symbol : null);
+    pos.currentPrice = await fetchPrice(tickerKey);
+    await new Promise(r => setTimeout(r, 150));
+  }
+
+  save();
+  document.getElementById('last-update').textContent =
+    'Zuletzt: ' + new Date().toLocaleTimeString('de-DE');
+
+  const noPrice = positions.filter(p => !p.currentPrice);
+  if (noPrice.length > 0) {
+    const names = noPrice.map(p => p.resolvedTicker || p.symbol).join(', ');
+    setStatus(`Fertig ✓ — Kein Kurs für: ${names}`, 'err');
+  } else {
+    setStatus(`Alle ${positions.length} Kurse aktualisiert ✓`, 'ok');
+  }
+  render();
+}
+
+// ─── SORT ────────────────────────────────────────────────────────────────────
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = false; }
+  render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function fmt(n, decimals=2) {
+  if (n == null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(n);
+}
+function fmtEur(n) {
+  if (n == null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(n);
+}
+function fmtPct(n) {
+  if (n == null || isNaN(n)) return '—';
+  return (n >= 0 ? '+' : '') + fmt(n, 2) + ' %';
+}
+
+function render() {
+  const hasPositions = positions.length > 0;
+  document.getElementById('emptyState').style.display   = hasPositions ? 'none' : 'block';
+  document.getElementById('summaryGrid').style.display  = hasPositions ? 'grid' : 'none';
+  document.getElementById('barSection').style.display   = hasPositions ? 'block': 'none';
+  document.getElementById('chartArea').style.display    = hasPositions ? 'flex' : 'none';
+  document.getElementById('tableSection').style.display = hasPositions ? 'block': 'none';
+  document.getElementById('divider1').style.display     = hasPositions ? 'block': 'none';
+  document.getElementById('divider2').style.display     = hasPositions ? 'block': 'none';
+  if (!hasPositions) return;
+
+  // Aktive vs. verkaufte Positionen trennen
+  const activePos = positions.filter(p => !p.sold);
+  const soldPos   = positions.filter(p => p.sold);
+
+  // Enrich (nur aktive)
+  const enriched = activePos.map((p, idx) => {
+    const price   = p.currentPrice ?? p.avgCost;
+    const capital = p.shares * p.avgCost;
+    const value   = p.shares * price;
+    const pnl     = value - capital;
+    const pnlPct  = capital > 0 ? (pnl / capital) * 100 : 0;
+    return { ...p, capital, value, pnl, pnlPct, idx };
+  });
+
+  const totalCapital  = enriched.reduce((a,b) => a + b.capital, 0);
+  const totalValue     = enriched.reduce((a,b) => a + b.value,   0);
+  const totalUnrealized = totalValue - totalCapital;
+  const totalRealized  = soldPos.reduce((a, b) => a + (b.realizedPnL || 0), 0);
+  const totalPnL       = totalUnrealized + totalRealized;
+  const totalPnLPct    = totalCapital > 0 ? (totalPnL / totalCapital) * 100 : 0;
+
+  // Add portfolio pct
+  enriched.forEach(p => { p.portfolioPct = totalValue > 0 ? (p.value / totalValue) * 100 : 0; });
+
+  // Sort
+  enriched.sort((a,b) => {
+    let va = a[sortCol] ?? 0, vb = b[sortCol] ?? 0;
+    if (typeof va === 'string') va = va.toLowerCase(), vb = vb.toLowerCase();
+    return sortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  // ── Summary cards
+  document.getElementById('sumCapital').textContent = fmtEur(totalCapital);
+  const vEl = document.getElementById('sumValue');
+  vEl.textContent = fmtEur(totalValue);
+  vEl.className = 'card-value';
+
+  const pEl = document.getElementById('sumPnL');
+  pEl.textContent = fmtEur(totalPnL);
+  pEl.className = 'card-value ' + (totalPnL >= 0 ? 'green' : 'red');
+  document.getElementById('sumPnLPct').textContent =
+    fmtPct(totalPnLPct) + (totalRealized !== 0 ? ` · Realisiert: ${fmtEur(totalRealized)}` : '');
+
+  const uEl = document.getElementById('sumUnrealized');
+  uEl.textContent = fmtEur(totalUnrealized);
+  uEl.className = 'card-value ' + (totalUnrealized >= 0 ? 'green' : 'red');
+  const unrealPct = totalCapital > 0 ? (totalUnrealized / totalCapital) * 100 : 0;
+  document.getElementById('sumUnrealizedSub').textContent = fmtPct(unrealPct) + ' auf offene Positionen';
+
+  document.getElementById('sumCount').textContent = enriched.length;
+  const wins = enriched.filter(p => p.pnl >= 0).length;
+  const soldLabel = soldPos.length > 0 ? ` · ${soldPos.length} verkauft` : '';
+  document.getElementById('sumWinLoss').textContent =
+    `${wins} im Plus · ${enriched.length - wins} im Minus${soldLabel}`;
+
+  // ── Stacked bar
+  const capPct  = totalValue > 0 ? Math.min((totalCapital / totalValue) * 100, 100) : 100;
+  const gainPct = totalPnL > 0   ? (totalPnL / totalValue) * 100 : 0;
+  const lossPct = totalPnL < 0   ? (-totalPnL / totalCapital) * 100 : 0;
+
+  const bCap = document.getElementById('barCapital');
+  const bPro = document.getElementById('barProfit');
+  const bLos = document.getElementById('barLoss');
+
+  bCap.style.width = capPct + '%';
+  bCap.textContent = capPct > 10 ? `Kapital ${fmt(capPct,1)}%` : '';
+
+  if (totalPnL > 0) {
+    bPro.style.display = 'flex';
+    bLos.style.display = 'none';
+    bPro.style.width = gainPct + '%';
+    bPro.textContent = gainPct > 6 ? `+${fmt(gainPct,1)}%` : '';
+  } else if (totalPnL < 0) {
+    bLos.style.display = 'flex';
+    bPro.style.display = 'none';
+    bLos.style.width = Math.min(lossPct, 30) + '%';
+    bLos.textContent = lossPct > 6 ? `-${fmt(lossPct,1)}%` : '';
+  }
+
+  // ── Donut chart
+  drawDonut(enriched, totalValue);
+
+  // ── Legend
+  const leg = document.getElementById('legendItems');
+  leg.innerHTML = enriched.map((p, i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${PALETTE[i % PALETTE.length]}"></div>
+      <span class="legend-sym">${p.symbol}</span>
+      <span style="flex:1;font-size:10px;color:var(--muted)">${p.name.substring(0,22)}</span>
+      <span class="legend-val">${fmtEur(p.value)}</span>
+      <span class="legend-pct">${fmt(p.portfolioPct,1)}%</span>
+    </div>`).join('');
+
+  // ── Table
+  const tbody = document.getElementById('tableBody');
+
+  const activeRows = enriched.map((p) => {
+    const pnlClass = p.pnl >= 0 ? 'green' : 'red';
+    const capW = p.value > 0 ? Math.min((p.capital / p.value) * 100, 100) : 100;
+    const proW = p.pnl > 0   ? (p.pnl / p.value) * 100 : 0;
+    const losW = p.pnl < 0   ? Math.min((-p.pnl / p.capital) * 100, 100) : 0;
+
+    return `<tr data-isin="${p.symbol}">
+      <td><div class="sym">${p.resolvedTicker || p.symbol}</div><div class="sym-name">${p.name.substring(0,28)}</div>${isISIN(p.symbol) && !p.resolvedTicker && !p.currentPrice ? '<div style="font-size:9px;color:var(--red)">ISIN nicht aufgelöst</div>' : ''}</td>
+      <td>${fmt(p.shares, p.shares % 1 === 0 ? 0 : 4)}</td>
+      <td style="color:var(--muted);font-size:11px">${p.totalBought ? fmt(p.totalBought, p.totalBought % 1 === 0 ? 0 : 4) : '—'}</td>
+      <td>${fmtEur(p.avgCost)}</td>
+      <td>${p.currentPrice ? fmtEur(p.currentPrice) : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${fmtEur(p.capital)}</td>
+      <td>${fmtEur(p.value)}</td>
+      <td><span class="pill ${pnlClass}">${fmtEur(p.pnl)}</span></td>
+      <td><span class="pill ${pnlClass}">${fmtPct(p.pnlPct)}</span></td>
+      <td>
+        <div class="mini-bar">
+          <div class="cap" style="width:${capW}%"></div>
+          <div class="pro" style="width:${proW}%"></div>
+          <div class="los" style="width:${losW}%"></div>
+        </div>
+      </td>
+      <td>${fmt(p.portfolioPct,1)} %</td>
+    </tr>`;
+  });
+
+  const soldRows = soldPos.map(p => {
+    const pnl      = p.realizedPnL || 0;
+    const pnlClass = pnl >= 0 ? 'green' : 'red';
+    const ticker   = tickerCache[p.symbol] || p.resolvedTicker || p.symbol;
+    return `<tr class="sold-row" data-isin="${p.symbol}">
+      <td>
+        <div class="sym">${ticker}</div>
+        <div class="sym-name">${p.name.substring(0,28)}</div>
+        <span style="font-size:9px;background:var(--border);padding:1px 6px;border-radius:10px;color:var(--muted);letter-spacing:0.05em">VERKAUFT</span>
+      </td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td><span class="pill ${pnlClass}" title="Realisierter G/V">${fmtEur(pnl)}</span></td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+      <td style="color:var(--muted)">—</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = [...activeRows, ...soldRows].join('');
+
+  // ── Positions-Tooltip (Transaktionshistorie bei Hover) ───────────────
+  const posTooltip = document.getElementById('posTooltip');
+  const txByIsin = {};
+  for (const tx of transactions) {
+    if (!txByIsin[tx.isin]) txByIsin[tx.isin] = [];
+    txByIsin[tx.isin].push(tx);
+  }
+
+  tbody.onmousemove = (e) => {
+    const tr = e.target.closest('tr[data-isin]');
+    if (!tr) { posTooltip.style.display = 'none'; return; }
+    const isin   = tr.dataset.isin;
+    const txList = (txByIsin[isin] || []).slice().sort((a,b) => a.date.localeCompare(b.date));
+    if (!txList.length) { posTooltip.style.display = 'none'; return; }
+
+    const name   = txList[0].name || isin;
+    const buys   = txList.filter(t => t.type === 'buy');
+    const sells  = txList.filter(t => t.type === 'sell');
+    const fmtD   = iso => new Date(iso).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'2-digit'});
+    const fmtSh  = n => fmt(n, n % 1 === 0 ? 0 : 4);
+
+    let html = `<div style="font-weight:600;font-size:12px;margin-bottom:6px">${name.substring(0,32)}</div>`;
+
+    if (buys.length) {
+      html += `<div class="tt-section">KÄUFE</div>`;
+      for (const tx of buys) {
+        html += `<div class="tt-row"><span>${fmtD(tx.date)}</span><span>${fmtSh(tx.shares)} Stk.</span><span>${fmtEur(tx.price)}</span></div>`;
+      }
+    }
+    if (sells.length) {
+      html += `<div class="tt-section">VERKÄUFE</div>`;
+      for (const tx of sells) {
+        html += `<div class="tt-row"><span>${fmtD(tx.date)}</span><span>${fmtSh(tx.shares)} Stk.</span><span>${fmtEur(tx.price)}</span></div>`;
+      }
+    }
+
+    posTooltip.innerHTML = html;
+    posTooltip.style.display = 'block';
+    const ttX = e.clientX + 18, ttY = e.clientY + 10;
+    posTooltip.style.left = (ttX + posTooltip.offsetWidth  > window.innerWidth  ? ttX - posTooltip.offsetWidth  - 36 : ttX) + 'px';
+    posTooltip.style.top  = (ttY + posTooltip.offsetHeight > window.innerHeight ? ttY - posTooltip.offsetHeight - 20 : ttY) + 'px';
+  };
+  tbody.onmouseleave = () => { posTooltip.style.display = 'none'; };
+}
+
+// ─── DONUT CANVAS ─────────────────────────────────────────────────────────────
+function drawDonut(data, total) {
+  const canvas = document.getElementById('donut');
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const cx = W/2, cy = H/2, R = W*0.42, r = W*0.24;
+  let angle = -Math.PI / 2;
+
+  data.forEach((p, i) => {
+    const slice = total > 0 ? (p.value / total) * Math.PI * 2 : 0;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, angle, angle + slice);
+    ctx.closePath();
+    ctx.fillStyle = PALETTE[i % PALETTE.length];
+    ctx.fill();
+    angle += slice;
+  });
+
+  // hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = getComputedStyle(document.documentElement)
+    .getPropertyValue('--bg').trim() || '#f5f2eb';
+  ctx.fill();
+
+  // center text
+  ctx.fillStyle = '#1a1814';
+  ctx.textAlign = 'center';
+  ctx.font = '500 11px "DM Mono", monospace';
+  ctx.fillText(data.length + ' Aktien', cx, cy - 4);
+  ctx.font = '400 10px "DM Mono", monospace';
+  ctx.fillStyle = '#8a8478';
+  ctx.fillText('im Portfolio', cx, cy + 12);
+}
+
+// ─── DRAG & DROP ─────────────────────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => parseCSV(ev.target.result);
+  reader.readAsText(file, 'UTF-8');
+});
+
+// ─── STATUS ──────────────────────────────────────────────────────────────────
+function setStatus(msg, type='') {
+  const el = document.getElementById('statusBar');
+  el.textContent = msg;
+  el.className = 'status-bar ' + type;
+}
+
+// ─── MONTHLY PNL ─────────────────────────────────────────────────────────────
+let monthlyChartInstance = null;
+
+function computeMonthlyPnL() {
+  // FIFO pro ISIN: Kaufkörbe aufbauen, bei Verkauf auflösen
+  const fifo = {}; // isin → [{shares, price}]
+  const monthly = {}; // "YYYY-MM" → { realized, bought, items: {isin: {name, pnl}} }
+
+  const sorted = [...transactions].sort((a, b) => a.date.localeCompare(b.date));
+
+  for (const tx of sorted) {
+    const ym = tx.date.substring(0, 7);
+    if (!monthly[ym]) monthly[ym] = { realized: 0, bought: 0, items: {} };
+
+    if (tx.type === 'buy') {
+      if (!fifo[tx.isin]) fifo[tx.isin] = [];
+      fifo[tx.isin].push({ shares: tx.shares, price: tx.price });
+      monthly[ym].bought += tx.shares * tx.price;
+    } else if (tx.type === 'sell') {
+      if (!fifo[tx.isin] || fifo[tx.isin].length === 0) continue;
+      let toSell = tx.shares;
+      let costBasis = 0;
+      while (toSell > 0 && fifo[tx.isin].length > 0) {
+        const lot = fifo[tx.isin][0];
+        const take = Math.min(toSell, lot.shares);
+        costBasis += take * lot.price;
+        lot.shares -= take;
+        toSell -= take;
+        if (lot.shares < 0.0001) fifo[tx.isin].shift();
+      }
+      const proceeds = tx.shares * tx.price;
+      const pnl = proceeds - costBasis;
+      monthly[ym].realized += pnl;
+      // Per-Aktie Aufschlüsselung für Tooltip
+      if (!monthly[ym].items[tx.isin])
+        monthly[ym].items[tx.isin] = { name: tx.name || tx.isin, pnl: 0 };
+      monthly[ym].items[tx.isin].pnl += pnl;
+    }
+  }
+
+  return monthly;
+}
+
+function renderMonthlyChart() {
+  const hasTx = transactions.length > 0;
+  document.getElementById('monthlySection').style.display = hasTx ? 'block' : 'none';
+  if (!hasTx) return;
+
+  const monthly = computeMonthlyPnL();
+  const labels  = Object.keys(monthly).sort();
+  const values  = labels.map(k => Math.round(monthly[k].realized * 100) / 100);
+
+  const colors = values.map(v => v >= 0 ? '#1d6b3e' : '#8b2020');
+  const bgColors = values.map(v => v >= 0 ? 'rgba(29,107,62,0.15)' : 'rgba(139,32,32,0.15)');
+
+  // Format label: "2024-03" → "Mär 24"
+  const monthNames = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const niceLabels = labels.map(l => {
+    const [y, m] = l.split('-');
+    return monthNames[parseInt(m) - 1] + " '" + y.substring(2);
+  });
+
+  const canvas = document.getElementById('monthlyChart');
+  const ctx = canvas.getContext('2d');
+
+  if (monthlyChartInstance) { monthlyChartInstance.destroy(); monthlyChartInstance = null; }
+
+  // Einfaches Bar-Chart ohne externe Lib
+  // devicePixelRatio-Skalierung verhindert unscharfe Darstellung auf HiDPI-Displays
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.offsetWidth || 800;
+  const H = 240;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = { top: 30, right: 20, bottom: 50, left: 70 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, W, H);
+
+  if (values.length === 0) return;
+
+  const maxAbs = Math.max(...values.map(Math.abs), 1);
+  const barW   = Math.max(6, Math.min(40, (chartW / values.length) * 0.7));
+  const gap    = chartW / values.length;
+
+  // Grid lines
+  ctx.strokeStyle = '#e2ddd4';
+  ctx.lineWidth = 1;
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + (chartH / gridLines) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    const val = maxAbs - (maxAbs * 2 / gridLines) * i;
+    ctx.fillStyle = '#8a8478';
+    ctx.font = '10px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText((val >= 0 ? '+' : '') + val.toFixed(0) + '€', pad.left - 6, y + 4);
+  }
+
+  // Zero line
+  const zeroY = pad.top + chartH / 2;
+  ctx.strokeStyle = '#1a1814';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.left, zeroY); ctx.lineTo(W - pad.right, zeroY); ctx.stroke();
+
+  // Bars
+  const barRects = [];
+  values.forEach((v, i) => {
+    const x    = pad.left + gap * i + gap / 2 - barW / 2;
+    const barH = Math.abs(v) / maxAbs * (chartH / 2);
+    const y    = v >= 0 ? zeroY - barH : zeroY;
+
+    barRects.push({ x, y, w: barW, h: barH,
+                    label: niceLabels[i], value: v, items: monthly[labels[i]]?.items || {} });
+
+    ctx.fillStyle = bgColors[i];
+    ctx.fillRect(x, v >= 0 ? zeroY - barH : zeroY, barW, barH);
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x, v >= 0 ? zeroY - barH : zeroY, barW, barH);
+
+    // Label oben/unten
+    ctx.fillStyle = colors[i];
+    ctx.font = 'bold 9px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    if (Math.abs(v) > maxAbs * 0.05) {
+      ctx.fillText((v >= 0 ? '+' : '') + v.toFixed(0), x + barW / 2, v >= 0 ? zeroY - barH - 4 : zeroY + barH + 11);
+    }
+
+    // X-Achse Label
+    ctx.fillStyle = '#8a8478';
+    ctx.font = '9px DM Mono, monospace';
+    ctx.fillText(niceLabels[i], x + barW / 2, H - 8);
+  });
+
+  // Monatstabelle
+  const totRealized = values.reduce((a, b) => a + b, 0);
+  const tableRows = labels.map((l, i) => {
+    const v = values[i];
+    const cls = v >= 0 ? 'green' : 'red';
+    return `<tr>
+      <td>${niceLabels[i]}</td>
+      <td><span class="pill ${cls}">${v >= 0 ? '+' : ''}${v.toFixed(2).replace('.',',')} €</span></td>
+    </tr>`;
+  }).reverse().join('');
+
+  document.getElementById('monthlyTable').innerHTML = `
+    <table style="width:280px;font-size:12px;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 12px;font-size:10px;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--border)">Monat</th>
+        <th style="text-align:left;padding:6px 12px;font-size:10px;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--border)">Realisiert</th>
+      </tr></thead>
+      <tbody>${tableRows}</tbody>
+      <tfoot><tr>
+        <td style="padding:8px 12px;font-weight:600;border-top:2px solid var(--border)">Gesamt</td>
+        <td style="padding:8px 12px;border-top:2px solid var(--border)">
+          <span class="pill ${totRealized >= 0 ? 'green' : 'red'}">${totRealized >= 0 ? '+' : ''}${totRealized.toFixed(2).replace('.',',')} €</span>
+        </td>
+      </tr></tfoot>
+    </table>`;
+
+  // ── Tooltip: Hover über Balken zeigt Aktien-Aufschlüsselung
+  const tooltip = document.getElementById('chartTooltip');
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const hit = barRects.find(b => mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h);
+    if (hit) {
+      canvas.style.cursor = 'pointer';
+      const entries = Object.entries(hit.items).sort((a,b) => Math.abs(b[1].pnl) - Math.abs(a[1].pnl));
+      const rows = entries.map(([isin, d]) => {
+        const col = d.pnl >= 0 ? 'var(--green)' : 'var(--red)';
+        return `<div style="display:flex;justify-content:space-between;gap:14px;padding:2px 0">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(d.name||isin).substring(0,26)}</span>
+          <span style="color:${col};font-weight:500;white-space:nowrap">${d.pnl>=0?'+':''}${d.pnl.toFixed(2).replace('.',',')} €</span>
+        </div>`;
+      }).join('');
+      const col = hit.value >= 0 ? 'var(--green)' : 'var(--red)';
+      tooltip.innerHTML =
+        `<div style="font-weight:600;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">
+          ${hit.label} &nbsp;<span style="color:${col}">${hit.value>=0?'+':''}${hit.value.toFixed(2).replace('.',',')} €</span>
+        </div>
+        ${rows || '<span style="color:var(--muted);font-size:10px">Keine Verkäufe in diesem Monat</span>'}`;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+      requestAnimationFrame(() => {
+        const tr = tooltip.getBoundingClientRect();
+        if (tr.right  > window.innerWidth  - 8) tooltip.style.left = (e.clientX - tr.width - 14) + 'px';
+        if (tr.bottom > window.innerHeight - 8) tooltip.style.top  = (e.clientY - tr.height + 10) + 'px';
+      });
+    } else {
+      canvas.style.cursor = '';
+      tooltip.style.display = 'none';
+    }
+  };
+  canvas.onmouseleave = () => { tooltip.style.display = 'none'; };
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+render();
+renderMonthlyChart();
+</script>
+</body>
+</html>
